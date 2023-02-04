@@ -100,5 +100,43 @@ app.post("/messages",
     }
 );
  
+// get all contacts
+app.get("/contacts", 
+    async (inRequest: Request, inResponse: Response) => {
+      try {
+        const contactsWorker: Contacts.Worker = new Contacts.Worker();
+        const contacts: IContacts[] = await contactsWorker.listContacts();
+        inResponse.json(contacts);
+      } catch (inError) {
+        inResponse.send("error");
+      }
+    }
+)
 
+// add a contact
+app.post("/contacts", 
+  async (inRequest: Request, inResponse: Response) => {
+    try {
+      const contactsWorker: Contacts.Worker = new Contacts.Worker();
+      const contact: IContact = await contactsWorker.addContact(inRequest.body);
+      inResponse.json(contact);
+    } catch (inError) {
+      inResponse.send("error");
+    }
+  }
+)
+
+// delete a contact
+app.post("/contacts/:id", 
+  async (inRequest: Request, inResponse: Response) => {
+    try {
+      const contactsWorker = new Contacts.Worker();
+      contactsWorker.deleteContact(inRequest.params.id, 10)
+      inResponse.send("ok");
+    }
+    catch (inError) {
+      inResponse.send("error");
+    }
+  }
+)
 
