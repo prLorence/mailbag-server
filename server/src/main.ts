@@ -13,9 +13,9 @@ const app: Express = express();
 app.use(express.json());
 
 // serve compiled cod
-app.use("/", 
-  express.static(path.join(__dirname, "../../client/dist"))
-)
+// app.use("/", 
+//   express.static(path.join(__dirname, "../../client/dist"))
+// )
 
 app.use(function(inRequest : Request, inResponse: Response, inNext: NextFunction) {
   // cors config
@@ -105,7 +105,7 @@ app.get("/contacts",
     async (inRequest: Request, inResponse: Response) => {
       try {
         const contactsWorker: Contacts.Worker = new Contacts.Worker();
-        const contacts: IContacts[] = await contactsWorker.listContacts();
+        const contacts: IContact[] = await contactsWorker.listContacts();
         inResponse.json(contacts);
       } catch (inError) {
         inResponse.send("error");
@@ -126,12 +126,25 @@ app.post("/contacts",
   }
 )
 
+// update a contact
+app.put("/contacts/:id", 
+  async (inRequest: Request, inResponse: Response) => {
+    try {
+      const contactsWorker = new Contacts.Worker();
+      contactsWorker.updateContact(inRequest.params.id, inRequest.body);
+      inResponse.send("ok");
+    } catch (inError) {
+      inResponse.send(inError);
+    }
+  }
+)
+
 // delete a contact
 app.post("/contacts/:id", 
   async (inRequest: Request, inResponse: Response) => {
     try {
       const contactsWorker = new Contacts.Worker();
-      contactsWorker.deleteContact(inRequest.params.id, 10)
+      contactsWorker.deleteContact(inRequest.params.id)
       inResponse.send("ok");
     }
     catch (inError) {

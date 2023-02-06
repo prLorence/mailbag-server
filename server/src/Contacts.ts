@@ -40,4 +40,30 @@ export class Worker {
       })
     })
   }
+
+  public updateContact(inID: string, inUpdateContact: IContact): Promise<number> {
+    return new Promise((inResolve, inReject) => {
+      this.db.update({_id: inID}, inUpdateContact, { }, (inError: Error | null, inNewContact: number) => {
+        if (inError) {
+          inReject(inError);
+        } else {
+          inResolve(inNewContact);
+        }
+      })
+    })
+  }
+
+  public deleteContact(inID: string): Promise<string> {
+    return new Promise((inResolve, inReject) => {
+      this.db.remove({_id: inID}, { }, (inError: Error | null, inNumRemoved: number) => {
+        if (inError) {
+          inReject(inError);
+        } else {
+          inResolve("");
+        }
+      })
+    })
+  }
+
 }
+

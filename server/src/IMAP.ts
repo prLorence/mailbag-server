@@ -38,7 +38,7 @@ export class Worker {
   Worker.serverInfo = inServerInfo;
   }
 
-  private async connectToServer(): Promise<any> {
+  public async connectToServer(): Promise<any> {
     const client: any = new ImapClient.default(
       Worker.serverInfo.imap.host,
       Worker.serverInfo.imap.port,
@@ -58,7 +58,7 @@ export class Worker {
     return client;
   }
 
-  private async listMailboxes(): Promise<IMailbox[]> {
+  public async listMailboxes(): Promise<IMailbox[]> {
     const client: any = await this.connectToServer();
     const mailboxes: any = await client.listMailboxes();
 
@@ -80,7 +80,7 @@ export class Worker {
     return finalMailboxes;
   }
 
-  private async listMessages(inCallOptions: ICallOptions): Promise<IMessage[]> {
+  public async listMessages(inCallOptions: ICallOptions): Promise<IMessage[]> {
     const client: any = await this.connectToServer();
 
     const mailbox: any = await client.selectMailbox(inCallOptions.mailbox);
@@ -110,7 +110,7 @@ export class Worker {
     return finalMessages;
   }
 
-  private async getMessageBody(inCallOptions: ICallOptions): Promise<string | undefined> {
+  public async getMessageBody(inCallOptions: ICallOptions): Promise<string | undefined> {
     const client: any = await this.connectToServer();
 
     const messages: any[] = await client.listMessages(

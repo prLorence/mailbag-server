@@ -4,7 +4,7 @@
   "description": "mailbag server",
   "main": "index.js",
   "scripts": {
-    "compile": "npx tsx && node ./dist/main.js",
+    "compile": "npx tsc && node ./dist/main.js",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js -e ts --exec \"npm run compile\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +24,7 @@
     "express": "^4.18.1",
     "mailparser": "^3.5.0",
     "nedb": "^1.8.0",
-    "nodemailer": "^6.7.7"
+    "nodemailer": "^6.7.7",
+    "tsx": "^3.12.3"
   }
 }
