@@ -1,6 +1,7 @@
 const ImapClient = require("emailjs-imap-client");
 import { ParsedMail } from "mailparser";
 import { simpleParser } from "mailparser";
+import { parse } from "path";
 import { IServerInfo } from "./ServerInfo";
 
 export interface ICallOptions {
@@ -78,4 +79,59 @@ export class Worker {
 
     return finalMailboxes;
   }
+
+  private async listMessages(inCallOptions: ICallOptions): Promise<IMessage[]> {
+    const client: any = await this.connectToServer();
+
+    const mailbox: any = await client.selectMailbox(inCallOptions.mailbox);
+
+    if (mailbox.exists === 0) {
+      await client.close();
+      return [ ]; 
+    }
+
+    const messages: any[] = await client.listMessages(
+      inCallOptions.mailbox, "1:*", ["uid", "envelope"]
+    );
+
+    await client.close();
+    
+    const finalMessages: IMessage[] = [];
+
+    messages.forEach((inValue: any) => {
+      finalMessages.push({
+        id: inValue.uid,
+        date: inValue.envelope.date,
+        from: inValue.envelope.from[0].address,
+        subject: inValue.envelope.subject
+      })
+    })
+
+    return finalMessages;
+  }
+
+  private async getMessageBody(inCallOptions: ICallOptions): Promise<string | undefined> {
+    const client: any = await this.connectToServer();
+
+    const messages: any[] = await client.listMessages(
+      inCallOptions.mailbox, inCallOptions.id,
+      [ "body[]" ], {byUid: true}
+    )
+
+    const parsed: ParsedMail = await simpleParser(messages[0]["body[]"]);
+    await client.close();
+    
+    return parsed.text;
+  }
+
+  public async deleteMessage(inCallOptions: ICallOptions): Promise<any> {
+    const client: any = await this.connectToServer();
+
+    await client.deleteMessage(
+      inCallOptions.mailbox, inCallOptions.id, {byUid: true}
+    );
+
+    await client.close();
+  }
+
 }
