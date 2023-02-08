@@ -15,6 +15,7 @@ const mailparser_1 = require("mailparser");
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 class Worker {
     constructor(inServerInfo) {
+        console.log("IMAP.Worker.constructor", inServerInfo);
         Worker.serverInfo = inServerInfo;
     }
     connectToServer() {
@@ -25,11 +26,13 @@ class Worker {
                 console.log("IMAP.Worker.listMailboxes(): Connection error", inError);
             };
             yield client.connect();
+            console.log("IMAP.Worker.listMailboxes(): Connected");
             return client;
         });
     }
     listMailboxes() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("IMAP.Worker.listMailboxes()");
             const client = yield this.connectToServer();
             const mailboxes = yield client.listMailboxes();
             yield client.close();
@@ -42,15 +45,17 @@ class Worker {
                     });
                     iterateChildren(inValue.children);
                 });
-                iterateChildren(mailboxes.children);
             };
+            iterateChildren(mailboxes.children);
             return finalMailboxes;
         });
     }
     listMessages(inCallOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("IMAP.Worker.listMessages()", inCallOptions);
             const client = yield this.connectToServer();
             const mailbox = yield client.selectMailbox(inCallOptions.mailbox);
+            console.log(`IMAP.Worker.listMessages(): Message count = ${mailbox.exists}`);
             if (mailbox.exists === 0) {
                 yield client.close();
                 return [];
@@ -71,6 +76,7 @@ class Worker {
     }
     getMessageBody(inCallOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("IMAP.Worker.getMessageBody()", inCallOptions);
             const client = yield this.connectToServer();
             const messages = yield client.listMessages(inCallOptions.mailbox, inCallOptions.id, ["body[]"], { byUid: true });
             const parsed = yield (0, mailparser_1.simpleParser)(messages[0]["body[]"]);
@@ -80,8 +86,9 @@ class Worker {
     }
     deleteMessage(inCallOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("IMAP.Worker.deleteMessage()", inCallOptions);
             const client = yield this.connectToServer();
-            yield client.deleteMessage(inCallOptions.mailbox, inCallOptions.id, { byUid: true });
+            yield client.deleteMessages(inCallOptions.mailbox, inCallOptions.id, { byUid: true });
             yield client.close();
         });
     }

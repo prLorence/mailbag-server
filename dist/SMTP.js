@@ -27,16 +27,20 @@ exports.Worker = void 0;
 const nodemailer = __importStar(require("nodemailer"));
 class Worker {
     constructor(inServerInfo) {
+        console.log("SMTP.Worker.constructor", inServerInfo);
         Worker.serverInfo = inServerInfo;
     }
     sendMessage(inOptions) {
+        console.log("SMTP.Worker.sendMessage()", inOptions);
         return new Promise((inResolve, inReject) => {
             const transport = nodemailer.createTransport(Worker.serverInfo.smtp);
             transport.sendMail(inOptions, (inError, inInfo) => {
                 if (inError) {
+                    console.log("SMTP.Worker.sendMessage(): Error", inError);
                     inReject(inError);
                 }
                 else {
+                    console.log("SMTP.Worker.sendMessage(): Ok", inInfo);
                     inResolve("");
                 }
             });
