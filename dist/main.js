@@ -35,7 +35,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
 const ServerInfo_1 = require("./ServerInfo");
 const IMAP = __importStar(require("./IMAP"));
@@ -45,10 +44,13 @@ const app = (0, express_1.default)();
 // responsible for parsing request bodies that contains json
 app.use(express_1.default.json());
 // serve compiled cod
-app.use("/", express_1.default.static(path_1.default.join(__dirname, "../../../mailbag-client/dist")));
+// app.use("/", 
+//   express.static(path.join(__dirname, "../../client/dist"))
+// )
 app.use(function (inRequest, inResponse, inNext) {
+    // cors config
     inResponse.header("Access-Control-Allow-Origin", "*");
-    inResponse.header("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+    inResponse.header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     inResponse.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept");
     inNext();
 });
@@ -113,7 +115,7 @@ app.post("/messages", (inRequest, inResponse) => __awaiter(void 0, void 0, void 
         inResponse.send("ok");
     }
     catch (inError) {
-        inResponse.send(inError);
+        inResponse.send("error");
     }
 }));
 // get all contacts
@@ -138,17 +140,6 @@ app.post("/contacts", (inRequest, inResponse) => __awaiter(void 0, void 0, void 
         inResponse.send("error");
     }
 }));
-// update a contact
-app.put("/contacts/:id", (inRequest, inResponse) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const contactsWorker = new Contacts.Worker();
-        contactsWorker.updateContact(inRequest.params.id, inRequest.body);
-        inResponse.send("ok");
-    }
-    catch (inError) {
-        inResponse.send(inError);
-    }
-}));
 // delete a contact
 app.post("/contacts/:id", (inRequest, inResponse) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -160,6 +151,3 @@ app.post("/contacts/:id", (inRequest, inResponse) => __awaiter(void 0, void 0, v
         inResponse.send("error");
     }
 }));
-app.listen(3001, () => {
-    console.log("MailBag server open for requests");
-});

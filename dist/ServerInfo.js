@@ -5,4 +5,3 @@ const path = require("path");
 const fs = require("fs");
 const rawInfo = fs.readFileSync(path.join(__dirname, "../serverInfo.json"));
 exports.serverInfo = JSON.parse(rawInfo);
-console.log("ServerInfo: ", exports.serverInfo);
